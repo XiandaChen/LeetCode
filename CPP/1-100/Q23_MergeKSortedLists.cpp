@@ -11,7 +11,7 @@ public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
         // Using lambda to compare elements
         auto cmp = [](ListNode* & a, ListNode* & b) {
-            return a->val > b->val;
+            return a->val > b->val; // increasing order
         };
         priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> q(cmp);
         // put first node of each list into priority queue
@@ -19,7 +19,6 @@ public:
             // must check if node exists
             if (node) q.push(node);
         }
-            
         
         ListNode *dummyHead = new ListNode(-1), *curr = dummyHead;
         while (!q.empty()) {
