@@ -2,14 +2,15 @@ class Solution {
 public:
     string longestPalindrome(string s) {
         if (s.empty()) return "";
-        int n = s.size(), dp[n][n] = {0}, start = 0, len = 1;
-        for (int i = 0; i < n; i++) {
-            dp[i][i] = 1;
-            for (int j = 0; j < i; j++) {
-                dp[j][i] = (s[i] == s[j] && (i - j < 2 || dp[j+1][i-1]));
-                if (dp[j][i] && len < i - j + 1) {
-                    len = i - j + 1;
-                    start = j;
+        int n = s.size(), start = 0, len = 1;
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+        for (int j = 0; j < n; ++j) {
+            for (int i = 0; i <= j; ++i) {	// i <= j
+                dp[i][j] = (s[i] == s[j]) &&
+                        (j - i < 2 || dp[i + 1][j - 1]); // dp
+                if (dp[i][j] && (len < j - i + 1)) {
+                    len = j - i + 1;
+                    start = i;
                 }
             }
         }
