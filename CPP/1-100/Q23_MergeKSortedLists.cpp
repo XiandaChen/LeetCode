@@ -11,7 +11,7 @@ public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
         // Using lambda to compare elements
         auto cmp = [](ListNode* & a, ListNode* & b) {
-            return a->val > b->val; // increasing order
+            return a->val > b->val; // min queue: increasing order
         };
         priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> q(cmp);
         // put first node of each list into priority queue
