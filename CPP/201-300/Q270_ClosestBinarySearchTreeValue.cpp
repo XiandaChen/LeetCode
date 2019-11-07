@@ -14,7 +14,8 @@ public:
         while (root) {
             if (abs(res - target) > abs(root->val - target))
                 res = root->val;
-            root = (root->val > target) ? root->left : root->right; // binary search tree: left < root < right
+			// binary search tree: left < root < right
+            root = (root->val > target) ? root->left : root->right; 
         }
         return res;
     }
