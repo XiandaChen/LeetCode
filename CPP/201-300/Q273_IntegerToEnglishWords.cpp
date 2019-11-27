@@ -18,7 +18,7 @@ public:
         string res;
         int a = num / 100, b = num % 100, c = num % 10;
         res = b < 20 ? v1[b] : v2[b / 10] + (c ? " " + v1[c] : "");     //
-        if (a > 0) res = v1[a] + " Hundred" + (b ? " " + res : "");
+        if (a > 0) res = v1[a] + " Hundred" + (b ? " " + res : "");		// b = 106 % 100 =6, c = 106 % 10 = 6
         return res;
     }
 };
