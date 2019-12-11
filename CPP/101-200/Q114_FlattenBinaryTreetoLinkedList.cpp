@@ -14,11 +14,11 @@ public:
         while (cur) {
             if (cur->left) {
                 TreeNode * tmp = cur->left;
-                while (tmp->right)
-                    tmp = tmp->right;
+                while (tmp->right) // right-most child of cur->left
+                    tmp = tmp->right; 
                 tmp->right = cur->right;
                 cur->right = cur->left;
-                cur->left = NULL; // must include
+                cur->left = NULL; // must
             }
             cur = cur->right;
         }

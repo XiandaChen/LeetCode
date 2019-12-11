@@ -7,21 +7,22 @@
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
+// Stack: inorder traversal
 class Solution {
 public:
     bool isValidBST(TreeNode* root) {
         if (!root) return true;
         stack<TreeNode*> st;
         TreeNode * p = root, * pre = NULL;
-        while (p || !st.empty()) {
-            while (p) {
+        while (p || !st.empty()) { // inorder traversal
+            while (p) { // left
                 st.push(p);
                 p = p->left;
             }
-            p = st.top(); st.pop();
-            if (pre && p->val <= pre->val) return false; // logic; <=
+            p = st.top(); st.pop(); // mid
+            if (pre && p->val <= pre->val) return false; // logic, <==
             pre = p;
-            p = p->right;
+            p = p->right; // right
         }
         return true;
     }

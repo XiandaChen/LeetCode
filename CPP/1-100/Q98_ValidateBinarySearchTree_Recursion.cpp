@@ -10,16 +10,13 @@
 class Solution {
 public:
     bool isValidBST(TreeNode* root) {
-        vector<int> res;
-        inorderTraversalDFS(root, res);
-        for (int i = 0; i < (int)res.size() - 1; ++i)
-            if (res[i] >= res[i + 1]) return false;
-        return true;
+        // long to cover int edge case: 2147483647
+        return isValidBST(root, LONG_MIN, LONG_MAX); 
     }
-    void inorderTraversalDFS(TreeNode* root, vector<int> & res) {
-        if (!root) return;
-        if (root->left) inorderTraversalDFS(root->left, res);
-        res.push_back(root->val);
-        if (root->right) inorderTraversalDFS(root->right, res);
+    bool isValidBST(TreeNode * node, long mn, long mx) {
+        if (!node) return true;
+        if (node->val <= mn || node->val >= mx) return false;
+        return isValidBST(node->left, mn, node->val) 
+            && isValidBST(node->right, node->val, mx);
     }
 };
