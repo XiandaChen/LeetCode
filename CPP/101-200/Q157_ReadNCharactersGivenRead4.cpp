@@ -12,10 +12,11 @@ public:
         char read4buf[4];
         int read4Cnt = 0, copyIndx = 0;
         for (int i = 0; i < n; ++i) {
-            if (read4Cnt == copyIndx) {
+            // character previously read4() have been move to buf
+            if (copyIndx == read4Cnt) { // read4() new characters
                 read4Cnt = read4(read4buf);
-                copyIndx = 0;
                 if (read4Cnt == 0) return i;
+                copyIndx = 0; // initial copyIndx
             }
             buf[i] = read4buf[copyIndx++];
         }
