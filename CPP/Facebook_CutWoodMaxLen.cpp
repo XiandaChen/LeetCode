@@ -32,3 +32,36 @@ int cutWoodMaxLen(vector<int> & woods, int k) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
