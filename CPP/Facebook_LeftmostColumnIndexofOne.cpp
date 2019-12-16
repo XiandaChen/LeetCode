@@ -4,29 +4,6 @@ Start from top right. Keep doing until we reach last row: go down if current ele
 Column number of final ptr is our answer.
 */
 
-/* test 
-int main()
-{
-	vector<vector<int>> m1 = {{0, 0, 0, 1},
-						  {0, 0, 1, 1},
-						  {0, 1, 1, 1},
-						  {0, 0, 0, 0}};
-	vector<vector<int>> m2 = {{0, 0, 0, 0},
-						  {0, 0, 0, 0},
-						  {0, 0, 0, 0},
-						  {0, 0, 0, 0}};
-	vector<vector<int>> m3 = {{0, 0, 0, 0},
-						  {0, 0, 0, 0},
-						  {0, 0, 0, 0},
-						  {0, 0, 0, 1}};
-                          
-	cout << "m1: " << findLeftMostColumnOfOne(m1) << endl;
-	cout << "m2: " << findLeftMostColumnOfOne(m2) << endl;
-	cout << "m3: " << findLeftMostColumnOfOne(m3) << endl;
- 
-	return 0;
-}
-*/
 
 // In a binary matrix (all elements are 0 and 1), every row is sorted in ascending order (0 to the left of 1). 
 // Find the leftmost column index with a 1 in it.
@@ -50,7 +27,31 @@ int findLeftMostColumnOfOne(vector<vector<int>> & matrix) {
     return res;
 }
 
+/* 
+cpp.sh test :
 
+int main()
+{
+	vector<vector<int>> m1 = {{0, 0, 0, 1},
+						  {0, 0, 1, 1},
+						  {0, 1, 1, 1},
+						  {0, 0, 0, 0}};
+	vector<vector<int>> m2 = {{0, 0, 0, 0},
+						  {0, 0, 0, 0},
+						  {0, 0, 0, 0},
+						  {0, 0, 0, 0}};
+	vector<vector<int>> m3 = {{0, 0, 0, 0},
+						  {0, 0, 0, 0},
+						  {0, 0, 0, 0},
+						  {0, 0, 0, 1}};
+                          
+	cout << "m1: " << findLeftMostColumnOfOne(m1) << endl;
+	cout << "m2: " << findLeftMostColumnOfOne(m2) << endl;
+	cout << "m3: " << findLeftMostColumnOfOne(m3) << endl;
+ 
+	return 0;
+}
+*/
 
 
 
