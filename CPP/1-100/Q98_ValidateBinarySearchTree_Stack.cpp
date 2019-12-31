@@ -8,6 +8,8 @@
  * };
  */
 // Stack: inorder traversal
+// 1) Do In-Order Traversal of the given tree and store the result in a temp array.
+// 2) Check if the temp array is sorted in ascending order, if it is, then the tree is BST.
 class Solution {
 public:
     bool isValidBST(TreeNode* root) {
@@ -20,7 +22,7 @@ public:
                 p = p->left;
             }
             p = st.top(); st.pop(); // mid
-            if (pre && p->val <= pre->val) return false; // logic, <==
+            if (pre && p->val <= pre->val) return false; // logic, must be <=
             pre = p;
             p = p->right; // right
         }
