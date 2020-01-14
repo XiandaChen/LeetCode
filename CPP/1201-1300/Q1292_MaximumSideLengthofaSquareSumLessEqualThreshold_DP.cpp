@@ -8,7 +8,7 @@ public:
             for (int j = 1; j <= n; ++j) 
                 // dp[0][j]=0, dp[i][0]=0, dp[i][j]=..+mat[i-1][j-1]
                 dp[i][j] = dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1] + mat[i - 1][j -1];
-        // auto sumRegion = [] (int x1, int y1, int x2, int y2, vector<vector<int>> & dp) {
+        // auto sumRegion = [] (int x1, int y1, int x2, int y2, vector<vector<int>> & dp) { //func1
         //     return dp[x2][y2] - dp[x2][y1 - 1] - dp[x1 - 1][y2] + dp[x1 -1][y1 - 1];
         // };
         auto sumRegion = [&] (int x1, int y1, int x2, int y2) { // '&' to use dp variable
@@ -17,8 +17,9 @@ public:
         int res = 0;
         for (int x = 1; x <= m; ++x) {
             for (int y = 1; y <= n; ++y) {
-                for (int k = 0; x + k <= m && y + k <= n; ++k) {
-                    // if (sumRegion(x, y, x + k, y + k, dp) > threshold) break;
+                // for (int k = 0; x + k <= m && y + k <= n; ++k) { // brute force, O(m*n * min(m,n))
+                for (int k = res; x + k <= m && y + k <= n; ++k) { // bounded search, O(m*n + min(m,n))
+                    // if (sumRegion(x, y, x + k, y + k, dp) > threshold) break; // to use func1
                     if (sumRegion(x, y, x + k, y + k) > threshold) break;
                     res = max(res, k + 1);
                 }

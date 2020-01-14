@@ -15,8 +15,8 @@ public:
             return dp[x2][y2] - dp[x2][y1 - 1] - dp[x1 - 1][y2] + dp[x1 -1][y1 - 1];
         };
         
+		// binary search
         int res = 0;
-        // binary search
         for (int x = 1; x <= m; ++x) {
             for (int y = 1; y <= n; ++y) {
                 int left = 0, right = min(m - x, n - y) + 1;
