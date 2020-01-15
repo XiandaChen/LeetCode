@@ -1,7 +1,7 @@
 class Solution {
 public:
     int findDuplicate(vector<int>& nums) {
-        int left = 0, right = nums.size();
+        int left = 1, right = nums.size();
         while (left < right) {
             int mid = left + (right - left) / 2, cnt = 0;
             for (int num : nums)
