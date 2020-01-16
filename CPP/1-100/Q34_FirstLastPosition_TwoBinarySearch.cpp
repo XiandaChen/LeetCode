@@ -1,6 +1,7 @@
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
+        if (nums.empty()) return {-1, -1};
         vector<int> res (2, -1);
         int left = 0, right = nums.size();
         // find the leftmost index

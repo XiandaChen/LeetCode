@@ -5,8 +5,7 @@ where boolean T means paid holiday and F means you can take a PTO.
 Find the maximum length of vacation an employee can take.
 */
 
-// ref. Q1004
-// sliding window 
+// ref. Q1004, sliding window 
 int maxVacation(vector<bool> & days, int ptos) {
 	int left = 0, numFalse = 0, res = 0;
 	// count num of F within sliding window [left, right]
