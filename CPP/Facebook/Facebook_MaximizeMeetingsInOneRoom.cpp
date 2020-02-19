@@ -7,6 +7,7 @@ Sort all meetings in increasing order of second number(Finish time) of each pair
 Selected not-overlapped intervals
 */
 
+// ref: Q1353. Maximum Number of Events That Can Be Attended
 int maxMeetingRooms(vector<vector<int>> & meetings) {
     if (meetings.size() == 0) return -1;
     
