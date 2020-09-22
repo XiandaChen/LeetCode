@@ -6,13 +6,17 @@ Output:  4
 */
 
 /*
-All elements before the required have first occurrence at even index (0, 2, ..) and next occurrence at odd index (1, 3, …). 
+All elements before the required have first occurrence at even index (0, 2, ..) 
+and next occurrence at odd index (1, 3, …). [even, odd]
 
-And all elements after the required element have first occurrence at odd index and next occurrence at even index.
+And all elements after the required element have first occurrence at odd index 
+and next occurrence at even index. [odd, even]
 
 1) Find the middle index, say 'mid'.
-2) If 'mid' is even, then compare arr[mid] and arr[mid + 1]. If both are same, then the required element after 'mid' else before 'mid'.
-3) If 'mid' is odd, then compare arr[mid] and arr[mid – 1]. If both are same, then the required element after 'mid' else before 'mid'.
+2) If 'mid' is even, then compare arr[mid] and arr[mid + 1]. 
+If both are same, then the required element is after 'mid', else before 'mid'.
+3) If 'mid' is odd, then compare arr[mid] and arr[mid – 1]. 
+If both are same, then the required element is after 'mid', else before 'mid'.
 */
 
 int uniqueNum (vector<int> & nums) {
