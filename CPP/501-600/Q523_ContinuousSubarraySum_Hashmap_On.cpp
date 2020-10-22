@@ -1,20 +1,17 @@
 class Solution {
 public:
     bool checkSubarraySum(vector<int>& nums, int k) {
-        int n = nums.size(), sum = 0;
-        // if (a%c == b%c), then (a-b)%c == 0
-        unordered_map<int, int> m{{0, -1}}; // sum%k--indx
+        if (nums.empty()) return false;
+        unordered_map<int, int> m; // sum%k -- first index
+        m[0] = -1;
+        int sum = 0, n = nums.size();
         for (int i = 0; i < n; ++i) {
             sum += nums[i];
-            int remainder = (k == 0) ? sum : (sum % k);
-            if (m.count(remainder)) {
-                // length of at least 2
-                // subarray [m[remain]+1, i] sum is a multiple of k
-                if (i - m[remainder] > 1) return true; 
+            if (k != 0) sum %= k; // remainder
+            if (m.count(sum)) {
+                if (i - m[sum] > 1) return true; // at leat size 2
             }
-            else {
-                m[remainder] = i;
-            }
+            else m[sum] = i;  // must, only recorde the first occurrance
         }
         return false;
     }
