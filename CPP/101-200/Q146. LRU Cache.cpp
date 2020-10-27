@@ -10,7 +10,7 @@ public:
         // Move this key to the front of the cache
         cache.splice(cache.begin(), cache, it->second);
         // cache.erase(it->second);
-        // cache.emplace_front(it->second)
+        // cache.emplace_front(it->second) 
         return it->second->second;
     }
     
