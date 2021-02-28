@@ -1,17 +1,25 @@
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
-        vector<int> subs;
-        for (int i = 0; i < (int)nums.size(); ++i) {
-            int left = 0, right = subs.size();
-            while (left < right) { // binary search the num in subs larger or equal to nums[i]
-                int mid = left + (right - left) / 2;
-                if (nums[i] <= subs[mid]) right = mid;
-                else left = mid + 1;
+        if (nums.empty()) return 0;
+        vector<int> subnums{nums[0]};
+        for (int a : nums) {
+            if (a < subnums[0]) { // switch the smallest one
+                subnums[0] = a;
             }
-            if (right >= subs.size()) subs.push_back(nums[i]); // nums[i] is larger than any num in subs
-            else subs[right] = nums[i];
+            else if (a > subnums.back()) { // add larger ones
+                subnums.push_back(a);
+            }
+            else {
+                int left = 0, right = subnums.size();
+                while (left < right) { // change the first num that no-less than a
+                    int mid = left + (right - left) / 2;
+                    if (subnums[mid] < a) left = mid + 1;
+                    else right = mid;
+                }
+                subnums[right] = a;
+            }
         }
-        return subs.size(); // length of LIS, but subs is not exactly an LIS
+        return subnums.size();
     }
 };
