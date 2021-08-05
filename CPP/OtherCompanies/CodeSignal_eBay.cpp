@@ -57,7 +57,8 @@ bool cyclicShift (vector<int> numbers) {
 }
 
 
-// Q3: check if matrix t can be inserted into matrix s
+// Q3: fill cell with replacement
+// check if matrix t can be inserted into matrix s
 // matrix includes '.' being available and '*' being obstacle,
 // t can be inserted to s if only if not '*' in t is overlapped with '*' in s,
 // at most k '*' in s are allowed to changed to be '.'.
