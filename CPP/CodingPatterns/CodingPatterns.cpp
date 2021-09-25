@@ -1737,17 +1737,798 @@ public:
 
 
 //########################### 11. Modified Binary Search #################################//
-// Ceiling num: the first larger number in ascending array
-int ceiling(const vector<int> &nums, int target) {
-    int n = nums.size(), left = 0, right = n - 1;
-    while (left < right) { // "<"
+// binary search, 
+int search(vector<int>& nums, int target) {
+	int left = 0, right = nums.size() - 1;
+	while (left <= right) {
+		int mid = left + (right - left) / 2;
+		if (nums[mid] == target) return mid;
+		else if (nums[mid] < target) left = mid + 1;
+		else right = mid - 1;
+	}
+	return -1; // for normal binary search
+}
+// Ceiling num: the first larger number in ascending array (no replicate)
+int searchCeilingNum(vector<int>& nums, int target) {
+	if (target > nums[nums.size() - 1]) return -1;
+	int left = 0, right = nums.size() - 1;
+	while (left <= right) {
+		int mid = left + (right - left) / 2;
+		if (nums[mid] == target) return mid;
+		else if (nums[mid] < target) left = mid + 1;
+		else right = mid - 1;
+	}
+	return left;
+}
+int searchCeilingNum(vector<int> &nums, int target) {
+    int left = 0, right = nums.size() - 1;
+    while (left < right) { // "<", end when left==right
         int mid = left + (right - left) / 2;
         if (nums[mid] < target) left = mid + 1;
         else right = mid;
-    }
-    
+    }    
     return (nums[right] >= target) ? right : -1;
 }
+
+// 744. Find Smallest Letter Greater Than Target
+// Input: letters = ["c","f","j"], target = "c"; Output: "f"
+class Solution {
+public:
+    char nextGreatestLetter(vector<char>& letters, char target) {
+        int n = letters.size(), left = 0, right = n - 1;
+        if (target < letters[0] || target >= letters[n - 1]){ // '>='
+            return letters[0];
+        }
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (letters[mid] <= target) left = mid + 1;
+            else right = mid - 1;
+        }
+        
+        // loop ends at left = right + 1
+        return letters[left];
+    }
+};
+
+// 34. Find First and Last Position of Element in Sorted Array
+// Input: nums = [5,7,7,8,8,10], target = 8; Output: [3,4]
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        int n = nums.size(), left = 0, right = n - 1;
+        int resLeft = -1, resRight = -1;
+        
+        // first num equal to target
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        if (left >= n || nums[left] != target) return {-1, -1};
+        
+        resLeft = left;
+        
+        // smallest num larger than target
+        left = 0, right = n - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] <= target) left = mid + 1;
+            else right = mid - 1;
+        }
+        resRight = left - 1;
+        
+        return {resLeft, resRight};
+    }
+};
+
+// 33. Search in Rotated Sorted Array, distinct elements
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int n = nums.size(), left = 0, right = n - 1;
+        while (left <= right) { // "<="
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            
+			// If allowing duplicates in nums, then skip from both sides
+			//if (nums[left] == nums[mid] && nums[mid] == nums[right]) {
+            //    ++left; --right;
+            //}
+            if (nums[left] <= nums[mid]) { // left part is sorted
+                if (nums[left] <= target && target < nums[mid]) right = mid - 1;
+                else left = mid + 1;
+            }
+            else { // right part is sorted
+                if (nums[mid] < target && target <= nums[right]) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+        return -1;
+    }
+};
+
+// 153. Find Minimum in Rotated Sorted Array
+// Input: nums = [3,4,5,1,2]; Output: 1
+// Explanation: The original array was [1,2,3,4,5] rotated 3 times.
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int n = nums.size(), left = 0, right = n - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+			// min elem: the one smaller than its left
+            if ((left < mid) && (nums[mid - 1] > nums[mid])) return nums[mid];
+            if ((mid < right) && (nums[mid] > nums[mid + 1])) return nums[mid + 1];
+            
+            if (nums[left] <= nums[mid]) { // left part is sorted
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+        
+        return nums[0]; // nums is not rotated
+    }
+};
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int n = nums.size(), left = 0, right = n - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < nums[right]) right = mid;
+            else left = mid + 1;
+        }
+        return nums[right]; 
+    }
+};
+
+// 1060. Missing Element in Sorted Array
+// Input: nums = [4,7,9,10], k = 3; Output: 8
+class Solution {
+public:
+    int missingElement(vector<int>& nums, int k) {
+        int left = 0, right = nums.size() - 1;
+        int cnt = missingCount(nums, right);
+        if (cnt < k) {
+            return nums[right] + k - cnt;
+        }
+        
+        while(left < right) {
+            int mid = left + (right - left) / 2;
+            cnt = missingCount(nums, mid);
+            if (cnt < k) left = mid + 1;
+            else right = mid;
+        }
+        
+        // not nums[right] - 1, not know previous missing before nums[right]
+        return nums[right - 1] + k - missingCount(nums, right - 1);
+    }
+    
+    // missing number from 0th to idx-th number
+    int missingCount(vector<int>& nums, int idx) {
+        return nums[idx] - nums[0] - idx; // [4,7,9]: 9-4-2=3
+    }
+};
+
+// 378. Kth Smallest Element in a Sorted Matrix
+// Time: O(N*logX), X = max-min, Space: O(1)
+class Solution {
+public:
+    int kthSmallest(vector<vector<int>>& matrix, int k) {
+        int left = matrix[0][0], right = matrix.back().back();
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            int cnt = less_equal_count(matrix, mid);
+            if (cnt < k) left = mid + 1;
+            else right = mid;
+        }
+        return right;
+    }
+    int less_equal_count(vector<vector<int>>& matrix, int val) {
+        // matrix: rows and columns are sorted in ascending order
+        // search from bottom-left
+        int n = matrix.size(), row = n - 1, col = 0, cnt = 0;
+        while (0 <= row && col < n) {
+            if (matrix[row][col] <= val) {
+                cnt += row + 1;
+                col++;
+            }
+            else {
+                row--;
+            }
+        }
+        return cnt;
+    }
+};
+
+
+//########################### 12. Bitwist XOR #################################//
+// 136. Single Number
+// Input: nums = [4,1,2,1,2]; Output: 4
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = 0;
+        for (int num : nums) res ^= num;
+        return res;
+    }
+};
+// 137. Single Number II
+// Input: nums = [0,1,0,1,0,1,99]; Output: 99
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = 0;
+        for (int i = 0; i < 32; i++) { // cnt at each i-th bit position
+            int bitCnt = 0;
+            for (int num : nums) {
+                bitCnt += (num >> i) & 1; // i-th bit in num has value 1
+            }
+            // set i-th bit in res to 1 if ith bitCnt is 1 not 3
+            res |= (bitCnt % 3) << i;  
+        }
+        return res;
+    }
+};
+// 260. Single Number III
+// Input: nums = [1,2,1,3,2,5]; Output: [3,5]
+class Solution {
+public:
+    vector<int> singleNumber(vector<int>& nums) {
+        int n1xn2 = 0;
+        for (int num : nums) n1xn2 ^= num;
+        
+        // rightMostSetBit: to partition all nums into two groups
+        // one has num1 (ith bit of 0) and the other has num2 (ith bit of 1)
+        int rightMostSetBit = 1;
+        while ((rightMostSetBit & n1xn2) == 0) {
+            rightMostSetBit <<= 1;  // right shift by one
+        }
+        
+        int num1 = 0, num2 = 0;
+        for (int num : nums) {
+            if ((num & rightMostSetBit) == 0) { // ith bit in num has value of 0
+                num1 ^= num;
+            }
+            else { // ith bit in num has value of 1
+                num2 ^= num;  
+            } 
+        }
+        
+        return {num1, num2};
+    }
+};
+
+// 1009. Complement of Base 10 Integer
+// Input: n = 5 (101);  Output: 2 (010)
+class Solution {
+public:
+    int bitwiseComplement(int num) {
+        // corner case
+        if (num == 0) return 1;
+        // complement = number ^ all_bits_set
+        int bitCnt = 0, tmp = num;
+        while (tmp > 0) {
+            bitCnt++;
+            tmp >>= 1;
+        }
+        int all_bits_set = pow(2, bitCnt) - 1;
+        return num ^ all_bits_set;
+    }
+};
+
+// 287. Find the Duplicate Number
+// Input: nums = [3,1,3,4,2]; Output: 3
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+            sort(nums.begin(), nums.end());
+
+            int n = nums.size(), left = 0, right = n - 1;
+            while (left < right) {
+                int mid = left + (right - left) / 2;
+                if ((0 < mid && nums[mid - 1] == nums[mid])
+                   || (mid < n - 1 && nums[mid + 1] == nums[mid])) return nums[mid];
+
+                if (mid >= nums[mid]) right = mid - 1;
+                else left = mid + 1;
+            }
+
+            return nums[right];
+    }
+};
+
+
+//########################### 13. Top K Elements #################################//
+// 215. Kth Largest Element in an Array
+// Time: O(N*log(N)), Space O(N)
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        priority_queue<int> q(nums.begin(), nums.end()); // time: N*logN
+        for (int i = k; i > 1; i--) q.pop();  // time: K*log(N)
+        return q.top();
+    }
+};
+// Time: O(N*logN), Space: O(1)
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int left = 0, right = nums.size() - 1;
+        while (true) {
+            int pos = divide(nums, left, right);
+            
+            // kth largest elem at (k-1)-th position
+            if (pos == k - 1) return nums[pos];
+            
+            if (pos > k - 1) right = pos - 1;
+            else left = pos + 1;
+        }
+    }
+    int divide(vector<int> & nums, int start, int end) { // quicksort
+        int pivot = nums[start], left = start + 1, right = end;
+        while (left <= right) {
+            if (nums[left] < pivot && nums[right] >= pivot) {
+                swap(nums[left++], nums[right--]); // swap: O(1)
+            }
+            else if (nums[left] >= pivot) {
+                left++;
+            }
+            else if (nums[right] < pivot) {
+                right--;
+            }
+        }
+        swap(nums[start], nums[right]);
+        return right;
+    }
+};
+
+// 347. Top K Frequent Elements
+// Input: nums = [1,1,1,2,2,3], k = 2; Output: [1,2]
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        priority_queue<pair<int, int>> q; // cnt-num, default maxheap
+        unordered_map<int, int> m; // num-cnt
+        vector<int> res;
+        for (int num : nums) m[num]++;
+        for (auto a : m) q.push({a.second, a.first});
+        for (int i = 0; i < k; i++) {
+            auto tmp = q.top(); q.pop();
+            res.push_back(tmp.second);
+        }
+        return res;
+    }
+};
+
+// 973. K Closest Points to Origin
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        auto cmp = [](auto& a, auto& b) {
+            // min heap, '>', i.e., next elem larger than cur elem
+            return (a[0] * a[0] + a[1] * a[1]) > (b[0] * b[0] + b[1] * b[1]);
+        };
+        priority_queue<vector<int>, vector<vector<int>>, decltype(cmp)> q(cmp);
+        vector<vector<int>> res;
+        
+        for (auto a : points) q.push(a);
+        
+        for (int i = k; i > 0; i--) {
+            res.push_back(q.top());
+            q.pop();
+        }
+        
+        return res;
+    }
+};
+
+// minimum cost to connect ropes
+// every step you pick two shortest ropes and connect them, 
+// then put it back to the selections, the process repeat until only one left.
+// Input = [3, 4, 5, 6]; Output: 36 = ((3 + 4) + (5 + 6)) = 7 + 11 + 18
+int minCostConnectRopes(vector<int>& ropes) {
+    if (ropes.size() <= 1) return 0;
+    
+    auto cmp = [](auto & a, auto & b) {
+        return a > b;
+    };
+    priority_queue<int, vector<int>, decltype(cmp)> q(cmp);
+    int cost = 0;
+    
+    for (auto a : ropes) q.push(a);
+    
+    while (q.size() > 1) {
+        int tmp1 = q.top(); q.pop();
+        int tmp2 = q.top(); q.pop();
+        cost += tmp1 + tmp2;
+        q.push(tmp1 + tmp2);
+    }
+    
+    return cost;
+}
+
+// 451. Sort Characters By Frequency
+// Input: s = "tree"; Output: "eert"
+class Solution {
+public:
+    string frequencySort(string s) {
+        priority_queue<pair<int, char>> q; // frequency-char, max-heap
+        unordered_map<char, int> m; //char-freq
+        string res = "";
+        
+        for (char c : s) m[c]++;
+        for (auto a : m) q.push({a.second, a.first});
+        
+        while (!q.empty()) {
+            auto tmp = q.top(); q.pop();
+            res.append(tmp.first, tmp.second);
+        }
+        
+        return res;
+    }
+};
+
+// 658. Find K Closest Elements
+// Note for duplicates
+// Input: arr=[0,1,1,1,2,3,6,7,8,9]; k=9, x=4; Output: [0,1,1,1,2,3,6,7,8]
+class Solution {
+public:
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        auto cmp = [](pair<int, int> &a, pair<int, int> &b) {
+            // sorted ascending arr: (idx1 < idx2) ==> (val1 < val2)
+            return (a.second < b.second) 
+                || ((a.second == b.second) && (a.first < b.first));
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(cmp)> q(cmp); // idx-dist
+        unordered_map<int, int> m; // idx-dist
+        
+        for (int i = 0; i < arr.size(); i++) {
+            m[i] = abs(arr[i] - x);
+        }
+        for (auto a : m) {
+            q.push({a.first, a.second});
+            if (q.size() > k) q.pop();
+        }
+        
+        vector<int> res;
+        while (!q.empty()) {
+            res.push_back(arr[q.top().first]);
+            q.pop();
+        }
+        sort(res.begin(), res.end());
+        
+        return res;
+    }
+};
+
+// Remove K nums from array to left maximum distinct numbers
+// Input: arr = {7, 3, 5, 8, 5, 3, 3}, k = 2; Output: 3
+int maxDistinctElemAfterRemoveKElems(vector<int>& nums, int k) {
+    auto cmp = [](pair<int, int> & a, pair<int, int> & b) {
+        return (a.second < b.second) 
+                || ((a.second == b.second) && (a.first < b.first));
+    };
+    priority_queue<pair<int, int>, vector<pair<int, int>>, 
+                    decltype(cmp)> q(cmp); // num-freq
+    unordered_map<int, int> m; // num-freq
+    int res = 0;
+    
+    for (int num : nums) m[num]++;
+    for (auto a : m) {
+        if (a.second > 1) q.push({a.first, a.second}); // num with freq >= 2
+        else res++;
+    }
+    
+    while (k > 0 && !q.empty()) {
+        auto tmp = q.top(); q.pop();
+        if (k - tmp.second <= 1) {
+            k = k - tmp.second + 1; // decrease freq-1 of num to make it distinct
+            res++;
+        }
+    }
+    
+    // NOTE 
+    if (k > 0) res -= k;
+    
+    return res;
+}
+
+// 1481. Least Number of Unique Integers after K Removals
+// Input: arr = [4,3,1,1,3,3,2], k = 3;  Output: 2
+// Explanation: Remove 4, 2 and either one of the two 1s or three 3s. 1 and 3 will be left.
+class Solution {
+public:
+    int findLeastNumOfUniqueInts(vector<int>& arr, int k) {
+        auto cmp = [](pair<int, int> &a, pair<int, int> &b) {
+            return (a.second > b.second)
+                || ((a.second == b.second) && (a.first < b.first));
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int>>, 
+                        decltype(cmp)> q(cmp);  // minHeap: num-freq
+        unordered_map<int, int> m; // num-freq
+        
+        for (int a : arr) m[a]++;
+        for (auto a : m) {
+            q.push({a.first, a.second});
+        }
+        
+        while (k > 0 && !q.empty()) {
+            auto tmp = q.top(); q.pop();
+            if (k - tmp.second < 0) {
+				// NOTE
+                q.push({tmp.first, tmp.second - k});
+                break;
+            }
+            else {
+                k -= tmp.second;
+            }
+        }
+        
+        return q.size();
+    }
+};
+
+// Sum of all elements between k1'th and k2'th smallest elements
+// Sort(): Time O(N*logN), Space O(N)
+// maxHeap: Time O(N*logk2), Space O(k2)
+int sumBetweenK1K2SmallestElem(vector<int> & nums, int k1, int k2) {
+    priority_queue<int> q; // maxHeap, contains k2 smallest elems
+    for (int num : nums) {
+        if (q.size() < k2) {
+            q.push(num);
+        }
+        else if (q.top() > num) {
+            q.pop();
+            q.push(num);
+        }
+    }
+    
+    int res = 0;
+    q.pop(); // exclude the k2th elem
+    while (q.size() > k1) {
+        res += q.top(); q.pop();
+    }
+    
+    return res;
+}
+
+
+// 767. Reorganize String, any two adjacent characters are not the same.
+class Solution {
+public:
+    string reorganizeString(string s) {
+        auto cmp = [](pair<char, int> & a, pair<char, int> & b) {
+            return (a.second < b.second) 
+                || ((a.second == b.second) && a.first > b.first);
+        };
+        priority_queue<pair<char, int>, vector<pair<char, int>>,
+                    decltype(cmp)> q(cmp); // maxHeap: char-freq
+        unordered_map<char, int> m; // char-freq
+        int len  = s.size();
+        string res = "";
+        
+        for (char c : s) m[c]++;
+        for (auto a : m) {
+            if (a.second > (len + 1) / 2) return ""; // optimization
+            q.push(a);
+        }
+        
+        while (q.size() >= 2) {
+            auto t1 = q.top(); q.pop();
+            auto t2 = q.top(); q.pop();
+            res += t1.first;
+            res += t2.first;
+            if (--t1.second) q.push(t1);
+            if (--t2.second) q.push(t2);
+        }
+        
+        // NOTE
+        if (q.size() > 0) res += q.top().first;
+        
+        return res;
+    }
+};
+// 358. Rearrange String k Distance Apart
+class Solution {
+public:
+    string rearrangeString(string s, int k) {
+        if (k <= 1) return s; // corner case: s="a", k=0
+        auto cmp = [](pair<char, int> & a, pair<char, int> & b) {
+            return (a.second < b.second)
+                || ((a.second == b.second) && (a.first > b.first));
+        };
+        priority_queue<pair<char, int>, vector<pair<char, int>>,
+                    decltype(cmp)> q(cmp); // maxHeap: char-freq
+        unordered_map<char, int> m; // char-freq
+        int len = s.size();
+        string res = "";
+        
+        for (char c : s) m[c]++;
+        for (auto a : m) q.push(a);
+        
+        while (!q.empty()) {
+            // num of positions to be filled in
+            int cnt = min(k, len);
+            vector<pair<char, int>> tmp; 
+            for (int i = cnt; i > 0; i--) {
+                if (q.empty()) return ""; // not more distinct char
+                auto t = q.top(); q.pop();
+                res += t.first;
+                if (--t.second) tmp.push_back(t);
+                --len; // NOTE
+            }
+            
+            for (auto a : tmp) q.push(a);
+        }
+        
+        return res;
+    }
+};
+
+// 621. Task Scheduler
+class Solution {
+public:
+    int leastInterval(vector<char>& tasks, int n) {
+        auto cmp = [](pair<char, int> & a, pair<char, int> & b) {
+            return (a.second < b.second)
+                || ((a.second == b.second) && (a.first > b.first));
+        };
+        priority_queue<pair<char, int>, vector<pair<char, int>>,
+                    decltype(cmp)> q(cmp); // maxHeap: task-num
+        unordered_map<char, int> m; // task-num
+        string res = "";
+        
+        for (char c : tasks) m[c]++;
+        for (auto a : m) q.push(a);
+        
+        while (!q.empty()) {
+            vector<pair<char, int>> tmp;
+            
+            for (int i = n + 1; i > 0; i--) { // NOTE, cycle: n+1
+                if (q.empty()) {
+                    res += '#'; // no distinct char, add 'idle'
+                }
+                else {
+                    auto t = q.top(); q.pop();
+                    res += t.first;
+                    if (--t.second) tmp.push_back(t);
+                    
+                    // the very last task
+                    if (t.second == 0 && tmp.empty() && q.empty()) break;
+                }
+            }
+            
+            for (auto a : tmp) q.push(a); // remaining tasks
+        }
+        
+        return res.size();
+    }
+};
+
+// 895. Maximum Frequency Stack
+// Input
+// ["FreqStack", "push", "push", "push", "push", "push", "push", "pop", "pop", "pop", "pop"]
+// [[], [5], [7], [5], [7], [4], [5], [], [], [], []]
+// Output: [null, null, null, null, null, null, null, 5, 7, 5, 4]
+class FreqStack {
+public:
+    FreqStack() { }
+    
+    void push(int val) {
+        maxFreq = max(maxFreq, ++freq[val]); // update maxFreq
+        m[freq[val]].push_back(val); // 
+    }
+    
+    int pop() {
+        int x = m[maxFreq].back(); // pop the most recent one
+        m[maxFreq].pop_back();
+        --freq[x]; // update freq map
+        if (m[maxFreq].empty()) { // update freq-values map
+            m.erase(maxFreq);
+            --maxFreq;
+        }
+        return x;
+    }
+private:
+    int maxFreq; // max
+    unordered_map<int, int> freq; // num-freq
+    unordered_map<int, vector<int>> m; // freq-valuesHavingSameFreq
+};
+
+
+//########################### 14. K way merge #################################//
+// 23. Merge k Sorted Lists, Time: O(N*logK), Space: O(K)
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto cmp = [](ListNode* & a, ListNode* & b) {
+            return a->val > b->val;
+        };
+        priority_queue<ListNode*, vector<ListNode*>,
+                decltype(cmp)> q(cmp); // minHeap
+        ListNode * res = new ListNode(-1), *cur = res; // res to return
+        
+        for (auto root : lists) {
+            if (root) q.push(root);
+        }
+        
+        while (!q.empty()) {
+            auto t = q.top(); q.pop();
+            
+            cur->next = t;
+            cur = cur->next;
+            if (t->next) q.push(t->next); // add next small value
+        }
+        
+        return res->next;
+    }
+};
+
+// Find kth smallest element in N arrays
+int kthSmallestInNarrays(vector<vector<int>>& nums, int k) {
+    auto cmp = [](pair<int, vector<int>> & a, pair<int, vector<int>> & b) {
+        return (a.first > b.first) 
+            || ((a.first == b.first) && a.second[0] > b.second[0]);
+    };
+    priority_queue<pair<int, vector<int>>, vector<pair<int, vector<int>>>,
+                    decltype(cmp)> q(cmp); // val-(rowIdx, colIdx)
+    int n = nums.size();
+                    
+    for (int i = 0; i < n; i++) {
+        q.push({nums[i][0], {i, 0}});
+    }
+    
+    while (k > 1 && !q.empty()) {
+        k--;
+        
+        auto t = q.top(); q.pop();
+        int row = t.second[0], col = t.second[1];
+        
+        if (col + 1 < nums[row].size()) {
+            q.push({nums[row][col + 1], {row, col + 1}});
+        }
+    }
+    
+    return (k > 1) ? -1 : q.top().first;
+}
+
+
+// 76. Minimum Window Substring
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> m; // char-freq
+        int left = 0, minLen = INT_MAX, cnt = 0;
+        string res = "";
+        
+        for (char c : t) m[c]++;
+        
+        for (int i = 0; i < s.size(); i++) {
+            if (--m[s[i]] >= 0) cnt++; // s[i] in t, increase cnt
+            // substring includes the whole t 
+            while (cnt == t.size()) {
+                // update substring
+                if (i - left + 1 < minLen) {
+                    minLen = i - left + 1;
+                    res = s.substr(left, minLen);
+                }
+                // shift subwindow right, and s[left] in t
+                if (++m[s[left]] > 0) cnt--;
+                ++left;
+            }
+        }
+        
+        return res;
+    }
+};
+
+
+
+
 
 
 
