@@ -13,8 +13,11 @@ public:
         }
         return res;
     }
-    void numIslands(vector<vector<char>> & grid, int i, int j, vector<vector<bool>> & visited) {
-        if (i < 0 || i >= grid.size() || j < 0 || j >= grid[0].size() || grid[i][j] == '0' || visited[i][j]) return;
+    void numIslands(vector<vector<char>> & grid, int i, int j, 
+	vector<vector<bool>> & visited) {
+        if (i < 0 || i >= grid.size() || j < 0 
+		|| j >= grid[0].size() || grid[i][j] == '0' 
+		|| visited[i][j]) return;
         visited[i][j] = true;
         numIslands(grid, i - 1, j, visited);
         numIslands(grid, i + 1, j, visited);

@@ -1,20 +1,3 @@
-/*
-// Definition for a Node.
-class Node {
-public:
-    int val;
-    Node* left;
-    Node* right;
-
-    Node() {}
-
-    Node(int _val, Node* _left, Node* _right) {
-        val = _val;
-        left = _left;
-        right = _right;
-    }
-};
-*/
 class Solution {
 public:
     Node* treeToDoublyList(Node* root) {
@@ -28,18 +11,14 @@ public:
     void inorderTraversal(Node * node, Node *& pre, Node *& head) {
         // binary tree inorder traversal
         if (!node) return;
-        inorderTraversal(node->left, pre, head);
-        
+        inorderTraversal(node->left, pre, head);   
         if (!head) { // access left-most node
             head = node;
-            pre = node;
-        }
+            pre = node;        }
         else {
             pre->right = node;
             node->left = pre;
-            pre = node;
-        }
-        
+            pre = node;        }
         inorderTraversal(node->right, pre, head);
     }
 };

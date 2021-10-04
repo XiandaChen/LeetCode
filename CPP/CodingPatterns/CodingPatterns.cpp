@@ -2370,6 +2370,8 @@ public:
 };
 
 // 621. Task Scheduler
+// Input: tasks = ["A","A","A","B","B","B"], n = 2; Output: 8
+// A -> B -> idle -> A -> B -> idle -> A -> B
 class Solution {
 public:
     int leastInterval(vector<char>& tasks, int n) {
@@ -2438,7 +2440,6 @@ private:
     unordered_map<int, int> freq; // num-freq
     unordered_map<int, vector<int>> m; // freq-valuesHavingSameFreq
 };
-
 
 //########################### 14. K way merge #################################//
 // 23. Merge k Sorted Lists, Time: O(N*logK), Space: O(K)
@@ -2526,7 +2527,381 @@ public:
     }
 };
 
+// 632. Smallest Range Covering Elements from K Lists
+// Input: nums = [[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]; Output: [20,24]
+class Solution {
+public:
+    vector<int> smallestRange(vector<vector<int>>& nums) {
+        auto cmp = [](pair<int, pair<int, int>> & a, pair<int, pair<int, int>> & b) {
+            return a.first > b.first;
+        };
+        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, 
+                        decltype(cmp)> q(cmp); // minHeap: val-<arrID, idx>
+        int curMax = INT_MIN, n = nums.size(), resLeft, resRight;
+        vector<int> arrLen(n);
+        
+        for (int i = 0; i < n; i++) {
+            arrLen[i] = nums[i].size();
+            
+            if (nums[i][0] > curMax) curMax = nums[i][0];
+            q.push({nums[i][0], {i, 0}});
+        }
+        
+        resLeft = q.top().first;
+        resRight = curMax;
+        
+        // queue holds n elems, i.e., covers n arrays
+        while (q.size() >= n) { 
+            auto t = q.top(); q.pop();
+            int arrID = t.second.first, idx = t.second.second;
+            
+            if ((curMax - t.first < resRight - resLeft)
+               || (curMax - t.first == resRight - resLeft && t.first < resLeft)) {
+                resLeft = t.first;
+                resRight = curMax;
+            }
+            
+            if (idx + 1 < arrLen[arrID]) {
+                q.push({nums[arrID][idx + 1], {arrID, idx + 1}});
+                if (nums[arrID][idx + 1] > curMax) curMax = nums[arrID][idx + 1];
+            }
+        }
+        
+        return {resLeft, resRight};
+    }
+};
 
+// 373. Find K Pairs with Smallest Sums
+// Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3; Output: [[1,2],[1,4],[1,6]]
+class Solution {
+public:
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+        auto cmp = [](vector<int> & a, vector<int> & b) {
+            return a[0] + a[1] < b[0] + b[1];
+        };
+        priority_queue<vector<int>, vector<vector<int>>, decltype(cmp)> q(cmp); // maxHeap
+        int len1 = nums1.size(), len2 = nums2.size();
+        vector<vector<int>> res;
+        
+        for (int i = 0; i < len1 && i < k; i++) { // i < k to reduce time
+            for (int j = 0; j < len2 && j < k; j++) {
+                if (q.size() < k) {
+                    q.push({nums1[i], nums2[j]});
+                }
+                else { // main k elems in the queue
+                    auto t = q.top();
+                    if (nums1[i] + nums2[j] < t[0] + t[1]) {
+                        q.pop();
+                        q.push({nums1[i], nums2[j]});
+                    }
+                }
+            }
+        }
+        
+        while (!q.empty()) {
+            res.push_back(q.top());
+            q.pop();
+        }
+        
+        return res;
+    }
+};
+
+
+//########################### 15. 01Knapsack_DP #################################//
+// 01 Knapsack
+// dp[i][c]: the maximum profit for capacity 'c' calculated from the first 'i' items
+int solveKnapsack(vector<int> & profits, vector<int> & weights, int capacity) {
+    if (capacity <= 0 || profits.empty() 
+        || profits.size() != weights.size()) return 0;
+    
+    int n = profits.size();
+        
+    vector<vector<int>> dp(n, vector<int>(capacity + 1, 0));
+    
+    for (int c = 0; c <= capacity; c++) {
+        if (weights[0] <= c) dp[0][c] = profits[0];
+    }
+    
+    for (int i = 1; i < n; i++) {
+        for (int c = 1; c <= capacity; c++) {
+            int profit = 0;
+            if (weights[i] <= c) { // if include item i
+                profit = dp[i - 1][c - weights[i]] + profits[i];
+            }
+            dp[i][c] = max(dp[i - 1][c], profit);
+        }
+    }
+
+    return dp[n - 1][capacity];
+}
+int solveKnapsack2(vector<int> & profits, vector<int> & weights, int capacity) {
+    if (capacity <= 0 || profits.empty() 
+        || profits.size() != weights.size()) return 0;
+    
+    int n = profits.size();
+        
+    vector<int> dp(capacity + 1, 0);
+    
+    for (int c = 0; c <= capacity; c++) {
+        if (weights[0] <= c) dp[c] = profits[0];
+    }
+    
+    for (int i = 1; i < n; i++) {
+        for (int c = capacity; c >= 0; c--) {
+            int profit = 0;
+            if (weights[i] <= c) { // if include item i
+                profit = dp[c - weights[i]] + profits[i];
+            }
+            dp[c] = max(dp[c], profit);
+        }
+    }
+    
+    return dp[capacity];
+}
+
+// 416. Partition Equal Subset Sum
+// Brute-force (O(2^n): find subset of nums with sum equal to sum/2
+// returns true if nums[0:idx] with sum equal to given sum
+bool canPartition(vector<int> & nums, int idx, int sum) {
+    if (sum == 0) return true;
+    if (idx < 0) return false;
+    if (nums[idx] > sum) {
+        return canPartition(nums, idx - 1, sum);
+    }
+    return canPartition(nums, idx - 1, sum) 
+            || canPartition(nums, idx - 1, sum - nums[idx]);
+}
+bool canPartition(vector<int>& nums) {
+    int sum = 0, n = nums.size();
+    for (int num : nums) sum += num;
+    if (sum %2 != 0) return false;
+    return canPartition(nums, n - 1, sum/2);
+}
+// DP (O(N*S), dp[i][s]: true if we can make sum 's' from the first 'i' numbers
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int sum = 0, n = nums.size();
+        for (int num : nums) sum += num;
+        if (sum %2 != 0) return false;
+        
+        sum /= 2;
+        
+        vector<vector<bool>> dp(n, vector<bool>(sum + 1));
+        
+        for (int i = 0; i < n; i++) dp[i][0] =  true;
+        for (int s = 1; s <= sum; s++) { // i = 1
+            dp[0][s] = (nums[0] == s) ? true : false;
+        }
+        
+        for (int i = 1; i < n; i++) {
+            for (int s = 1; s <= sum; s++) { // <=
+                bool tmp = false;
+                if (nums[i] <= s) { // include i-th num
+                    tmp = dp[i - 1][s - nums[i]];
+                }
+                // exclude or include ith num
+                dp[i][s] = dp[i - 1][s] || tmp;
+            }
+        }
+        
+        return dp[n - 1][sum];
+    }
+};
+
+// Count of subset with sum equals to target
+// Input: nums = {1, 2, 7, 1, 5}; target = 9; Output: 3, {1,1,7}, {2,7}, {1,2,1,5}
+    int countSubsetSumEqualTarget(vector<int> & nums, int target) {
+        int n = nums.size();
+
+        // dp[i][s]: num of subsets in nums[0:i] have sum equals to s
+        vector<vector<int>> dp(n + 1, vector<int>(target + 1));  // NOTE n+1
+
+        for (int i = 0; i <= n; i++) dp[i][0] = 1; // empty-set for target=0
+        for (int s = 1; s <= target; s++) dp[0][s] = 0;  // empty-set for target=s
+
+        for (int i = 1; i <= n; i++) {
+			// NOTE: s=0; if s=1, error for nums=[0,0,0,0,0,0,0,0,1], target=1, output=1, but expected=256
+            for (int s = 0; s <= target; s++) { 
+                // excluding nums[i]
+                dp[i][s] = dp[i - 1][s];
+                // including nums[i]
+                if (nums[i - 1] <= s) dp[i][s] += dp[i - 1][s - nums[i - 1]];  // NOTE: +=
+            }
+        }
+
+        return dp[n][target];
+    }
+
+// 494. Target Sum, num ways to add '+'/'-' before each integer to get sum equals to target
+// Input: nums = [1,1,1,1,1], target = 3; Output: 5
+class Solution {
+public:
+    int findTargetSumWays(vector<int>& nums, int target) {
+        int n = nums.size();
+        vector<unordered_map<int, int>> memo(n); // ith memo: sumVal at ith pos - numWays
+        return findTargetSumWays(nums, target, 0, memo);
+    }
+    // num ways of nums[idx:] equals to target
+    int findTargetSumWays(vector<int>& nums, unsigned int target, int idx, 
+                          vector<unordered_map<int, int>> & memo) {
+        if (idx == nums.size()) return target == 0;
+        if (memo[idx].count(target)) return memo[idx][target];
+        
+        int cnt1 = findTargetSumWays(nums, target - nums[idx], idx + 1, memo);
+        int cnt2 = findTargetSumWays(nums, target + nums[idx], idx + 1, memo);
+        
+        return memo[idx][target] = cnt1 + cnt2;
+    }
+};
+// Method 2: Using method in [Count of subset with sum equals to target] problem
+// sum(set1) - sum(set2) = target, sum(set1) + sum(set2) = sum(nums)
+// sum(set1) - sum(set2) + sum(set1) + sum(set2) = target + sum(nums)
+// ==> 2 * sum(set1) = target + sum(nums)
+// ==> sum(set1) = (target + sum(nums)) / 2, i.e., [Count of subset with sum equals to (target + sum(nums)) / 2] 
+
+
+//########################### 16. Topological_Sort_Graph #################################//
+// 207. Course Schedule, i.e., check if directed graph has a cycle
+// Input: numCourses = 2, prerequisites = [[1,0]]; Output: true
+// Time: O(V+E), Space: O(V+E)
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, vector<int>> graph; // parent-children
+        unordered_map<int, int> inDegrees; // node-incomingDegree
+        queue<int> sources; // zero-degree sources
+        vector<int> topSortedNodes;  // already topologically sorted nodes
+        
+        // [0,1]: course 1 is prerequisite of course 0, i..e, 1->0
+        for (auto a : prerequisites) {
+            graph[a[1]].push_back(a[0]);
+            inDegrees[a[0]]++;
+        }
+        
+        for (int i = 0; i < numCourses; i++) {
+            if (inDegrees[i] == 0) sources.push(i); // NOTE
+        }
+        
+        while (!sources.empty()) {
+            int s = sources.front(); sources.pop();
+            topSortedNodes.push_back(s);
+            
+            vector<int> children = graph[s];
+            for (int child : children) {
+                if (--inDegrees[child] == 0) sources.push(child);
+            }
+        }
+        
+        return topSortedNodes.size() == numCourses;
+    }
+};
+
+
+
+
+// 269. Alien Dictionary
+// Input: words = ["wrt","wrf","er","ett","rftt"]; Output: "wertf"
+class Solution {
+public:
+    string alienOrder(vector<string>& words) {
+        unordered_map<char, vector<char>> graph; // parent-children
+        unordered_map<char, int> indegrees;  // char-incomingDegree
+        set<char> chars; // record all distinct chars
+        queue<char> sources; // zero-degree nodes
+        int n = words.size();
+        string res = "";
+        
+        for (int i = 1; i < n; i++) {
+            int len1 = words[i - 1].size(), len2 = words[i].size();
+            int j = 0;
+            for (; j < min(len1, len2); j++) {
+                if (words[i - 1][j] == words[i][j]) continue;
+                else {
+                    graph[words[i - 1][j]].push_back(words[i][j]);
+                    indegrees[words[i][j]]++;
+                    break; // only record the first different chars
+                }
+            }
+            
+            // error, e.g., compaing "abc" and "ab"; space must be smaller than other chars
+			// If the first min(s.length, t.length) letters are the same, 
+			// then s is smaller if and only if s.length < t.length.
+            if (len1 > len2 && j == len2) return ""; 
+        }
+        
+        for (string s : words) {
+            for (char c : s) {
+                chars.insert(c);
+            }
+        }
+        for (char c : chars) {
+            if (indegrees[c] == 0) sources.push(c);
+        }
+        
+        while (!sources.empty()) {
+            char c = sources.front(); sources.pop();
+            res += c;
+            
+            vector<char> children = graph[c];
+            for (char child : children) {
+                if (--indegrees[child] == 0) sources.push(child);
+            }
+        }
+        
+        return (res.size() == chars.size()) ? res : "";
+    }
+};
+
+// 444. Sequence Reconstruction
+// Input: org = [1,2,3], seqs = [[1,2],[1,3],[2,3]]; Output: true
+// Input: org = [1,2,3], seqs = [[1,2],[1,3]]; Output: false
+class Solution {
+public:
+    bool sequenceReconstruction(vector<int>& org, vector<vector<int>>& seqs) {
+        if (!org.empty() && seqs.empty()) return false;
+        
+        int n = org.size();
+        for (auto seq : seqs) {
+            for (int val : seq) {
+                if (val < 1 || val > n) return false;  // NOTE, corner case
+            }
+        }
+        
+        unordered_map<int, vector<int>> graph; // parent-children
+        unordered_map<int, int> indegrees; 
+        queue<int> sources; // zero degree nodes
+        vector<int> res;
+        
+        // construct graph
+        for (auto seq : seqs) {
+            for (int j = 1; j < seq.size(); j++) {
+                graph[seq[j - 1]].push_back(seq[j]);
+                indegrees[seq[j]]++;
+            }
+        }
+        
+        // zero-degree sources
+        for (int val : org) {
+            if (indegrees[val] == 0) sources.push(val);
+        }
+        
+        while (!sources.empty()) {
+            // NOTE, to get unique sequence
+            if (sources.size() > 1) return false;  
+            
+            int t = sources.front(); sources.pop();
+            res.push_back(t);
+            
+            vector<int> children = graph[t];
+            for (int child : children)
+                if (--indegrees[child] == 0) sources.push(child);
+        }
+        
+        return res == org;
+    }
+};
 
 
 
