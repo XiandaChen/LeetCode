@@ -2765,6 +2765,7 @@ public:
 //########################### 16. Topological_Sort_Graph #################################//
 // 207. Course Schedule, i.e., check if directed graph has a cycle
 // Input: numCourses = 2, prerequisites = [[1,0]]; Output: true
+// prerequisite explanation: [0,1]: course 1 is prerequisite of course 0, i..e, 1->0
 // Time: O(V+E), Space: O(V+E)
 class Solution {
 public:
@@ -2798,7 +2799,71 @@ public:
     }
 };
 
-
+// getAllTopologicalOrdering, backtracking
+// prerequisite explanation: [0,1]: course 1 is prerequisite of course 0, i..e, 1->0
+// Input: numCourses = 4; prerequisites = {{3, 2}, {3, 0}, {2, 0}, {2, 1}}; 
+// Output: [[0, 1, 2, 3], [1, 0, 2, 3]]
+void getAllTopologicalOrdering(unordered_map<int, vector<int>> & graph,
+        unordered_map<int, int> & inDegrees, vector<int> & sources,
+         vector<int> & sortedNodes, vector<vector<int>> & res) {
+    if (!sources.empty()) {
+        for (int vertex : sources) {
+            sortedNodes.push_back(vertex);
+            vector<int> sourcesForNextCall = sources;
+            // remove the current source
+            sourcesForNextCall.erase(find(sourcesForNextCall.begin(), 
+                    sourcesForNextCall.end(), vertex));
+            
+            vector<int> children = graph[vertex];
+            for (int child : children) {
+                // save new source for next call
+                if (--inDegrees[child] == 0) sourcesForNextCall.push_back(child);
+            }
+            
+            // recursive call to get other ordering from the 
+            // remaining (and new) sources
+            getAllTopologicalOrdering(graph, inDegrees, sourcesForNextCall, 
+                    sortedNodes, res);
+                    
+            // backtrack, remove the vertex from the sorted order, 
+            // and put all of it children back to consider the next source
+            // instead of the current vertex
+            sortedNodes.erase(find(sortedNodes.begin(), sortedNodes.end(), vertex));
+            for (int child : children) {
+                inDegrees[child]++;
+            }
+        }
+    } // if (!sources.empty())
+    
+    // if sortedNodes doesn't contain all tasks,
+    // either we have a cyclic dependency between tasks,
+    // or we have not processed all the tasks in the recursive call
+    if (sortedNodes.size() == inDegrees.size()) {
+        res.push_back(sortedNodes);
+    }
+}
+vector<vector<int>> getAllTopologicalOrdering(int numCourses, vector<vector<int>>& prerequisites) {
+    unordered_map<int, vector<int>> graph; // parent-children
+    unordered_map<int, int> inDegrees; // node-incomingDegree
+    vector<int> sources; // zero-degree sources
+    vector<int> sortedNodes;  // already topologically sorted nodes
+    
+    vector<vector<int>> res; // all topological ordering
+    
+    // [0,1]: course 1 is prerequisite of course 0, i..e, 1->0
+    for (auto a : prerequisites) {
+        graph[a[1]].push_back(a[0]);
+        inDegrees[a[0]]++;
+    }
+    
+    for (int i = 0; i < numCourses; i++) {
+        if (inDegrees[i] == 0) sources.push_back(i); // NOTE
+    }
+    
+    getAllTopologicalOrdering(graph, inDegrees, sources, sortedNodes, res);
+    
+    return res;
+}
 
 
 // 269. Alien Dictionary
@@ -2903,7 +2968,47 @@ public:
     }
 };
 
+// 310. Minimum Height Trees
+// Input: n = 4, edges = [[1,0],[1,2],[1,3]]; Output: [1]
+// Input: n = 6, edges = [[3,0],[3,1],[3,2],[3,4],[5,4]]; Output: [3,4]
+class Solution {
+public:
+    vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges) {
+        unordered_map<int, set<int>> graph; // edges: node-connectedNodes
+        vector<int> degrees(n, 0);
+        queue<int> sources; // nodes of degree 1
+        set<int> nodes; // all nodes 0-(n-1)
+        
+        for (auto edge : edges) {
+            graph[edge[0]].insert(edge[1]);
+            graph[edge[1]].insert(edge[0]);
+            degrees[edge[0]]++;
+            degrees[edge[1]]++;
+        }
+        
+        for (int i = 0; i < n; i++) {
+            nodes.insert(i);
+            if (degrees[i] == 1) sources.push(i);
+        }
+        
+        while (!sources.empty()) {
+            if (nodes.size() <= 2) break; // remaining only one or two nodes
+            
+            // peel it layer by layer
+            for (int i = sources.size(); i > 0; i--) {
+                int t = sources.front(); sources.pop(); // current node of degree 1, called node-1
+                nodes.erase(t); // update remaining nodes after removing the leafe node t
 
+                for (int child : graph[t]) { // nodes connected to node-1, called parent-1
+                    graph[child].erase(child); // remove node-1 from parent-1's connectedNodes
+                    if (--degrees[child] == 1) sources.push(child); // parent-1 has 1 degree
+                }                
+            }
+        }
+        
+        return vector<int> (nodes.begin(), nodes.end());
+    }
+};
 
 
 
