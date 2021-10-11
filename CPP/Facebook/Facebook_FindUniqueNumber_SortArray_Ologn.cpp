@@ -1,3 +1,5 @@
+//540. Single Element in a Sorted Array
+
 /*
 Given a sorted array in which all elements appear twice (one after one) and one element appears only once. 
 Find that element in O(log n) complexity.
@@ -34,13 +36,13 @@ int uniqueNum (vector<int> & nums) {
             if (mid + 1 < n && nums[mid] ==  nums[mid + 1])
                 left = mid + 2;
             else
-                right = mid - 2;
+                right = mid;
         }
         else {
             if (mid - 1 >= 0 && nums[mid] == nums[mid - 1])
                 left = mid + 1;
             else
-                right = mid - 1;
+                right = mid;
         }
     }
     return nums[right];
