@@ -64,7 +64,7 @@ public:
 //  accumulative sum
 class Solution {
 public:
-    int subarraySum(vector<int>& nums, int k) {
+    int subarraySum(vector<int>& nums, int k) { // Time Limit Exceeded
         if (nums.empty()) return 0;
         vector<int> sums (nums.size());
         sums[0] = nums[0];
@@ -590,8 +590,35 @@ public:
 };
 
 // 238. Product of Array Except Self
-// see Facebook Explore
-
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> fwd(n, 1), bck(n, 1), res(n, 0);
+        for (int i = 1; i < n; ++i) // fwd[0] = 1
+            fwd[i] = fwd[i - 1] * nums[i - 1];
+        for (int i = n - 2; i >= 0; --i) // bck[n-1] = 1
+            bck[i] = bck[i + 1] * nums[i + 1];
+        for (int i = 0; i < n; ++i)
+            res[i] = fwd[i] * bck[i];
+        return res;
+    }
+};
+// Constant space complexity
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int n = nums.size(), back = 1;
+        vector<int> res(n, 1);
+        for (int i = 1; i < n; ++i)
+            res[i] = res[i - 1] * nums[i - 1]; // fwd(n, 1)
+        for (int i = n - 1; i >= 0; --i) {
+            res[i] *= back; // res[i] = fwd[i] * bck[i]
+            back *= nums[i]; // bck[i] = bck[i+1] * nums[i+1]
+        }
+        return res;
+    }
+};
 // 1249. Minimum Remove to Make Valid Parentheses
 class Solution {
 public:
@@ -780,3 +807,674 @@ public:
         return (sign == -1) ? -res : res;
     }
 };
+
+// 827. Making A Large Island
+// allowed to change at most one 0 to be 1.
+class Solution { // Time Limit Exceeded!
+public:
+    int largestIsland(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size(), res = 0;
+        bool hasZero = false;
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) continue;
+                
+                hasZero =  true;
+                
+                grid[i][j] = 1; // change 0 to 1, then search num ones starting from [i][j]
+                vector<vector<bool>> visited(m, vector<bool>(n, false));
+                res = max(res, helper(grid, i, j, visited));
+                if (res == m * n) return res; // NOTE
+                grid[i][j] = 0; // reset [i][j]
+            }
+        }
+        
+        return (hasZero) ? res : m * n;
+    }
+    
+    int helper(vector<vector<int>>& grid, int i, int j, vector<vector<bool>> & visited) {
+        int m = grid.size(), n = grid[0].size();
+        if (i < 0 || i >= m || j < 0 || j >= n || grid[i][j] == 0 || visited[i][j]) return 0;
+        
+        visited[i][j] = true;
+        vector<vector<int>> dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        int res = 1;  // 1 for current [i][j]
+        for (auto & dir : dirs) {
+            res += helper(grid, i + dir[0], j + dir[1], visited);
+        }
+        return res;
+    }
+};
+
+// 235. Lowest Common Ancestor of a Binary Search Tree
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (!root) return nullptr;
+        
+        if (root->val > p->val && root->val > q->val) 
+            return lowestCommonAncestor(root->left, p, q);
+        
+        if (root->val < p->val && root->val < q->val)
+            return lowestCommonAncestor(root->right, p, q);
+        
+        return root;
+    }
+};
+// 236. Lowest Common Ancestor of a Binary Tree
+// TreeNode *p and *q exist in the tree
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (!root || root == p || root == q) return root; // one of p/q to be ancestor of the other
+        
+        TreeNode * left = lowestCommonAncestor(root->left, p, q);
+        TreeNode * right = lowestCommonAncestor(root->right, p, q);
+        
+        // if p and q exist at two diff sides, root is the ancestor
+        if (left && right) return root;
+        
+        return (left) ? left : right;
+    }
+};
+// 1644. Lowest Common Ancestor of a Binary Tree II
+// If either node p or q does not exist in the tree, return null. All values of the nodes in the tree are unique.
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (checkIfExists(root, p) && checkIfExists(root, q))
+            return lca(root, p, q);
+        else
+            return NULL;
+    }
+    
+    TreeNode* lca(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (!root || root == p || root == q) return root; // one of p/q to be ancestor of the other
+        
+        TreeNode * left = lca(root->left, p, q);
+        TreeNode * right = lca(root->right, p, q);
+        
+        // if p and q exist at two diff sides, root is the ancestor
+        if (left && right) return root;
+        
+        return (left) ? left : right;
+    }
+    
+    bool checkIfExists(TreeNode* root, TreeNode* node){
+        if(root == NULL || node == NULL)
+            return false;
+        if(root->val == node->val)
+            return true;
+        if(checkIfExists(root->left, node) || checkIfExists(root->right, node))
+            return true;
+        
+        return false;
+    }
+};
+// 1650. Lowest Common Ancestor of a Binary Tree III
+// Given two nodes of a binary tree p and q, return their lowest common ancestor (LCA).
+// Each node will have a reference to its parent node. 
+class Solution {
+public:
+    Node* lowestCommonAncestor(Node* p, Node * q) {
+        if (p == NULL || q == NULL || p == q) return p;
+        
+        if (search(p, q)) return p;
+        else if (search(q, p)) return q;
+        else return lowestCommonAncestor(p->parent, q->parent);
+    }
+    
+    bool search(Node * root, Node * node) { // check if node in root
+        if (!root) return false;
+        
+        if (root == node || search(root->left, node) || search(root->right, node))
+            return true;
+        else 
+            return false;
+    }
+};
+// 1676. Lowest Common Ancestor of a Binary Tree IV
+// Given the root of a binary tree and an array of TreeNode objects nodes
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, vector<TreeNode*> &nodes) {
+        if (!root) return NULL;
+        
+        if (nodes.size() == 1) return nodes[0];
+        
+        for (auto & node : nodes) {
+            if (node == root) return root;  // if nodes include root
+        }
+        
+        bool left = search(root->left, nodes);
+        bool right = search(root->right, nodes);
+        
+        if (left && right) { // nodes exist in both left and right sides
+            return root;
+        }
+        else if (left) {
+            return lowestCommonAncestor(root->left, nodes);
+        }
+        else {
+            return lowestCommonAncestor(root->right, nodes);
+        }
+    }
+    
+    // true: if there is a node in current tree
+    bool search(TreeNode* root, vector<TreeNode*> &nodes) {
+        if (!root) return false;
+        for (auto & node : nodes) {
+            if (root->val == node->val) return true;
+        }
+        return search(root->left, nodes) || search(root->right, nodes);
+    }
+};
+
+// 1762. Buildings With an Ocean View
+// a building has an ocean view if all the buildings to its right have a smaller height.
+// Input: heights = [4,2,3,1]; Output: [0,2,3]
+class Solution {
+public:
+    vector<int> findBuildings(vector<int>& heights) {
+        int n = heights.size(), curMax = 0;
+        vector<int> maxRight(n), res;
+        
+        maxRight[n - 1] = 0;
+        
+        for (int i = n - 2; i >= 0; i--){
+            curMax = max(curMax, heights[i + 1]);
+            maxRight[i] = curMax;
+        }
+        
+        for (int i = 0; i < n; i++) {
+            if (heights[i] > maxRight[i]) res.push_back(i);
+        }
+        
+        return res;
+    }
+};
+
+// 1047. Remove All Adjacent Duplicates (size of two) In String
+// Input: s = "abbaca"; Output: "ca"
+// Input: s = "aaaaaaaaa"; Output: "a"
+class Solution {
+public:
+    string removeDuplicates(string s) {
+        stack<char> st;
+        string res;
+        
+        for (char c : s) {
+            if (st.empty()) st.push(c);
+            else if (st.top() == c) st.pop(); // remove adjacent duplicates
+            else st.push(c);
+        }
+        
+        while (!st.empty()) {
+            res.push_back(st.top());
+            st.pop();
+        }
+        
+        reverse(res.begin(), res.end());
+        
+        return res;
+    }
+};
+// 1209. Remove All Adjacent Duplicates in String II
+// Input: s = "deeedbbcccbdaa", k = 3; Output: "aa"
+// Input: s = "pbbcggttciiippooaais", k = 2; Output: "ps"
+class Solution {
+public:
+    string removeDuplicates(string s, int k) {
+        stack<pair<char, int>> st; // char-cnt
+        string res;
+        
+        for (char c : s) {
+            if (st.size() > 0 && st.top().first == c) st.top().second++;
+            else st.push({c, 1});
+            
+            if (st.top().second == k) st.pop();
+        }
+        
+        while (!st.empty()) {
+            while (st.top().second--) {
+                res.push_back(st.top().first);
+            }
+            st.pop();
+        }
+        
+        reverse(res.begin(), res.end());
+        
+        return res;
+    }
+};
+
+// 1382. Balance a Binary Search Tree
+class Solution {
+public:
+    TreeNode* balanceBST(TreeNode* root) {
+        vector<TreeNode*> orders;
+        inorder(root, orders);
+        return buildBST(orders, 0, orders.size() - 1); // build BST using mid node as root
+    }
+    
+    void inorder(TreeNode* root, vector<TreeNode*> & orders) {
+        if (!root) return;
+        inorder(root->left, orders);
+        orders.push_back(root);
+        inorder(root->right, orders);
+    }
+    
+    TreeNode * buildBST(vector<TreeNode*> & orders, int start, int end) {
+        if (start > end) return NULL; // NOTE, must
+        int mid = start + (end - start) / 2;
+        
+        TreeNode * node = orders[mid];
+        node->left = buildBST(orders, start, mid - 1);
+        node->right = buildBST(orders, mid + 1, end);
+        
+        return node;
+    }
+};
+
+// 766. Toeplitz Matrix
+// A matrix is Toeplitz if every diagonal from top-left to bottom-right has the same elements.
+class Solution {
+public:
+    bool isToeplitzMatrix(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i > 0 && j > 0 && matrix[i - 1][j - 1] != matrix[i][j]) return false;
+            }
+        }
+        return true;
+    }
+};
+
+// 422. Valid Word Square
+// Input: words = ["abcd","bnrt","crmy","dtye"]; Output: true
+// Input: words = ["abcd","bnrt","crm","dt"]; Output: true
+class Solution {
+public:
+    bool validWordSquare(vector<string>& words) {
+        if (words.empty()) return false;
+
+        // NOTE, words[i].size() may be equal to words[j].size() for i!=j
+        for (int i = 0; i < words.size(); i++) {
+            for (int j = 0; j < words[i].size(); j++) {
+                // if not symmetric
+                if (j >= words.size() || i >= words[j].size()) return false;
+                
+                if (i != j && words[i][j] != words[j][i]) return false;
+            }
+        }
+        
+        return true;
+    }
+};
+
+// 408. Valid Word Abbreviation
+class Solution {
+public:
+    bool validWordAbbreviation(string word, string abbr) {
+        int i = 0, j = 0, m = word.size(), n = abbr.size();
+        
+        while (i < m && j < n) {
+            if (isdigit(abbr[j])) {
+                if (abbr[j] == '0') return false; // abbr not start with 0
+                
+                int cnt = 0;
+                while (j < n && isdigit(abbr[j])) {
+                    cnt = cnt * 10 + (abbr[j++] - '0');
+                }
+                
+                i += cnt;                
+            }
+            else {
+                if (word[i++] != abbr[j++]) return false;
+            }
+        }
+        
+        return i == m && j == n;
+    }
+};
+
+// 42. Trapping Rain Water
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int res = 0, left = 0, right = height.size() - 1;
+        
+        while (left < right) {
+            int boundBar = min(height[left], height[right]);
+            
+            if (boundBar == height[left]) {
+                left++;
+                while (left < right && boundBar > height[left]) {
+                    res += (boundBar - height[left++]);
+                }
+            }
+            else {
+                right--;
+                while (left < right && boundBar > height[right]) {
+                    res += (boundBar - height[right--]);
+                }
+            }
+        }
+        
+        return res;
+    }
+};
+
+// 31. Next Permutation
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int n = nums.size(), i = n - 2, j = n - 1;
+        // find the first drop from right, 2 in [1,2,7,4,3,1]
+        while (i >= 0 && nums[i] >= nums[i + 1]) i--;
+        // find the first larger than 2 from right, 3, in [1,2,7,4,3,1]
+        if (i >= 0) { // NOTE, in case [3, 2, 1]
+            while (j >= i && nums[j] <= nums[i]) j--;
+            swap(nums[i], nums[j]); // [1,3,7,4,2,1]
+            
+        }
+        reverse(nums.begin() + i + 1, nums.end());
+    }
+};
+
+// 215. Kth Largest Element in an Array
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int left = 0, right = nums.size() - 1;
+        while (true) {
+            int pos = divide(nums, left, right);
+            
+            if (pos == k - 1) return nums[pos];
+            else if (pos > k - 1) right = pos - 1;
+            else left = pos + 1;
+        }
+    }
+    int divide(vector<int> & nums, int start, int end) { // quick sort
+        int pivot = nums[start], left = start + 1, right = end;
+        while (left <= right) { // NOTE, <=
+            if (nums[left] < pivot && nums[right] > pivot) {
+                swap(nums[left++], nums[right--]);
+            }
+            else if (nums[left] >= pivot) {
+                left++;
+            }
+            else if (nums[right] <= pivot) {
+                right--;
+            }
+        }
+        swap(nums[start], nums[right]);
+        return right;
+    }
+};
+
+// 680. Valid Palindrome II
+class Solution {
+public:
+    bool validPalindrome(string s) {
+        int left = 0, right = s.size() - 1;
+        while (left < right) {
+            if (s[left] != s[right]) {
+                return isPalindrome(s, left, right - 1) || isPalindrome(s, left + 1, right);
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+    bool isPalindrome(string s, int left, int right) {
+        while (left < right) { // NOTE, < : s = "abca" is true
+            if (s[left] != s[right]) return false;
+            left++;
+            right--;
+        }
+        return true;
+    }
+};
+
+// 528. Random Pick with Weight
+class Solution {
+public:
+    Solution(vector<int>& w) {
+        // sum[0] = w[0]; // error
+        sum = w;
+        for (int i = 1; i < w.size(); ++i)
+            sum[i] = sum[i - 1] + w[i];
+    }
+    int pickIndex() {
+        // w=[1,3,2], sum=[1,4,6], x=rand()%6=[0,~,5]
+        // x=0 -> w1; x=[1,2,3] -> w2; x=[4,5] -> w3
+        int x = rand() % sum.back();
+        int left = 0, right = sum.size() - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (sum[mid] <= x) left = mid + 1; // error '<', sum is 1-indexed, x is 0-indexed
+            else right = mid;
+        }
+        return left;
+    }
+private:
+    vector<int> sum; // accumulative sum
+};
+
+// 124. Binary Tree Maximum Path Sum
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        int res = INT_MIN;
+        maxPathToLeaf(root, res);
+        return res;
+    }
+    int maxPathToLeaf(TreeNode * node, int & res) { // maxsum of path from cur node to a leaf 
+        if (!node) return 0;
+        int left = max(maxPathToLeaf(node->left, res), 0); // maxPathSum of path rooting a node->left
+        int right = max(maxPathToLeaf(node->right, res), 0);
+        res = max(res, left + right + node->val);
+        return max(left, right) + node->val; // only max(left, right)
+    }
+};
+
+// 227. Basic Calculator II
+class Solution {
+public:
+    int calculate(string s) {
+        if (s.empty()) return 0; // corner case
+        int n = s.size(), res = 0, lastNum = 0, curNum = 0;
+        char lastOp = '+';  // previous operator: 1+2*3 => 0+1+2*3
+        for (int i = 0; i < n; ++i) {
+            char curChar = s[i];
+            if ('0' <= curChar && curChar <= '9') curNum = curNum * 10 + (curChar - '0');
+            
+            if (i == n - 1 || curChar == '+' || 
+                curChar == '-' || curChar == '*' || curChar == '/') {
+                if (lastOp == '+' || lastOp == '-') {
+                    res += lastNum;
+                    lastNum = (lastOp == '+') ? curNum : -curNum;
+                }
+                else if (lastOp == '*') {
+                    lastNum *= curNum;
+                }
+                else if (lastOp == '/') {
+                    lastNum /= curNum;
+                }
+                lastOp = curChar;
+                curNum = 0;
+            }
+        }
+        return res + lastNum;  // must, add the very last num
+    }
+};
+
+// 953. Verifying an Alien Dictionary
+class Solution {
+public:
+    bool isAlienSorted(vector<string>& words, string order) {
+        unordered_map<char, int> umap; // char-order
+        
+        for (int i = 0; i < (int)order.size(); i++) {
+            umap[order[i]] = i;
+        }
+        
+        for (int i = 1; i < (int)words.size(); i++) {
+            int j = 0, m = words[i - 1].size(), n = words[i].size();
+            for (; j < min(m, n); j++) {
+                if (umap[words[i - 1][j]] < umap[words[i][j]]) break; // sorted
+                else if (umap[words[i - 1][j]] == umap[words[i][j]]) continue; // check next pair
+                else return false;
+            }
+            if (m > n && j == n) return false;  // first word is longer than second word
+        }
+        
+        return true;
+    }
+};
+// 269. Alien Dictionary
+class Solution {
+public:
+    string alienOrder(vector<string>& words) {
+        unordered_map<char, vector<char>> graph; // parent-children
+        unordered_map<char, int> indegrees;  // char-incomingDegree
+        set<char> chars; // record all distinct chars
+        queue<char> sources; // zero-degree nodes
+        int n = words.size();
+        string res = "";
+        
+        for (int i = 1; i < n; i++) {
+            int len1 = words[i - 1].size(), len2 = words[i].size();
+            int j = 0;
+            for (; j < min(len1, len2); j++) {
+                if (words[i - 1][j] == words[i][j]) continue;
+                else {
+                    graph[words[i - 1][j]].push_back(words[i][j]);
+                    indegrees[words[i][j]]++;
+                    break; // only record the first different chars
+                }
+            }
+            
+            // error, e.g., compaing "abc" and "ab"; space must be smaller than other chars
+            if (len1 > len2 && j == len2) return ""; 
+        }
+        
+        for (string s : words) {
+            for (char c : s) {
+                chars.insert(c);
+            }
+        }
+        for (char c : chars) {
+            if (indegrees[c] == 0) sources.push(c);
+        }
+        
+        while (!sources.empty()) {
+            char c = sources.front(); sources.pop();
+            res += c;
+            
+            vector<char> children = graph[c];
+            for (char child : children) {
+                if (--indegrees[child] == 0) sources.push(child);
+            }
+        }
+        
+        return (res.size() == chars.size()) ? res : "";
+    }
+};
+
+// 199. Binary Tree Right Side View
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        if (!root) return {};
+        vector<int> res;
+        queue<TreeNode*> q({root});
+        while (!q.empty()) {
+            res.push_back(q.back()->val); // NOTE, back(), add the value of right-most node in last level
+            for (int i = q.size(); i > 0; --i) {
+                TreeNode * t = q.front(); q.pop();
+                if (t->left) q.push(t->left);
+                if (t->right) q.push(t->right);
+            }
+        }
+        return res;
+    }
+};
+
+// 415. Add Strings
+// Input: str1='12345', str2='65432'; Output: '77777'
+class Solution {
+public:
+    string addStrings(string str1, string str2) {
+        // corner cases
+        if (str1.empty() && str2.empty()) return "";
+        else if (str1.empty()) return str2;
+        else if (str2.empty()) return str1;
+
+        int i = str1.size() - 1, j = str2.size() - 1, curry = 0;
+        string res = "";
+
+        // add strings
+        while (i >= 0 || j >= 0) { // Time: O(max(len1, len2));  Space: O(1)
+            int x = (i >= 0) ? (str1[i--] - '0') : 0;
+            int y = (j >= 0) ? (str2[j--] - '0') : 0;
+            int val = (x + y + curry) % 10;
+            // res.insert(res.begin(), to_string(val)); // insert(): O(N), total O(N^2)
+            res += (val + '0');
+            curry = (x + y + curry) / 10;  
+        }
+
+        if (curry) res += (curry + '0');
+
+        reverse(res.begin(), res.end());  // time, O(N)
+
+        return res;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

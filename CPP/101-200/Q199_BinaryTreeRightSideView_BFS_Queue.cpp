@@ -14,7 +14,7 @@ public:
         vector<int> res;
         queue<TreeNode*> q({root});
         while (!q.empty()) {
-            res.push_back(q.back()->val); // add the value of right-most node in last level
+            res.push_back(q.back()->val); // NOTE, back(), add the value of right-most node in last level
             for (int i = q.size(); i > 0; --i) {
                 TreeNode * t = q.front(); q.pop();
                 if (t->left) q.push(t->left);

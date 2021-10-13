@@ -7,13 +7,11 @@ public:
             if (boundbar == height[left]) {
                 left++;
                 while (left < right && height[left] < boundbar) 
-                    res += boundbar - height[left++];
-            }
+                    res += boundbar - height[left++];            }
             else {
                 right--;
                 while (left < right && height[right] < boundbar)
-                    res += boundbar - height[right--];
-            }
+                    res += boundbar - height[right--];            }
         }
         return res;
     }
