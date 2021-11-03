@@ -60,7 +60,7 @@ public:
         return files[filePath];
     }
 private:
-    unordered_map<string, string> files; // filename-content
+    unordered_map<string, string> files; // filepath-content
     unordered_map<string, set<string>> dirs; // dir-<files, subdir>
 };
 
@@ -73,7 +73,7 @@ public:
     bool helper(vector<vector<char>> & board, int i, int j) {
         if (i == 9) return true; // successfully check all rows
         if (j >= 9) return helper(board, i + 1, 0); // check new row
-        if (board[i][j] != '.') return helper(board, i, j + 1); // not need to feel position[i][j]
+        if (board[i][j] != '.') return helper(board, i, j + 1); // not need to fill position[i][j]
         
         for (char c = '1'; c <= '9'; c++) {
             if (!isValid(board, i, j, c)) continue; // char c not fit
@@ -1339,62 +1339,3 @@ public:
         if (root->right) leaves(root->right, res);
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
