@@ -85,7 +85,8 @@ int main() {
 //################# 2. ####################//
 // design a class that offers two public functions/methods, 
 // AddNumber(int num): return void
-// LongestConsecutive(): return the length of the longest consecutive element sequence from the number num that were added by AddNumber(int num).
+// LongestConsecutive(): return the length of the longest consecutive element sequence 
+// from the number num that were added by AddNumber(int num).
 
 // e.g. 
 // LongestConvsecutive() Output: 0
@@ -99,6 +100,7 @@ int main() {
 
 // 128. Longest Consecutive Sequence
 // Input: nums = [100,4,200,1,3,2]; Output: 4
+// Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. 
 class Solution {
 public:
     int longestConsecutive(vector<int>& nums) {
@@ -115,6 +117,11 @@ public:
         return res;
     }
 };
+
+
+
+
+
 
 
 
