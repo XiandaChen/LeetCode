@@ -1,13 +1,5 @@
 #include <iostream>
 
-int main() {
-    // you can write to stdout for debugging purposes, e.g.
-    std::cout << "This is a debug message" << std::endl;
-
-    return 0;
-}
-
-
 // job-priority
 // job: int id
 // priority: 3: high, 2: medium, 1:low
@@ -29,7 +21,6 @@ int main() {
 
 void printPriority(vector<vector<int>> & jobs, int n) {
     // modify in-place, jobs
-
 
     // [1, 3] [2, 3]
 
@@ -73,8 +64,25 @@ Requirement: Time O(N), should be only one pass, not two passes!
              Modify in-place
 
 
-
-
+// 75. Sort Colors
+// Input: nums = [2,0,2,1,1,0]; Output: [0,0,1,1,2,2]
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int left = 0, cur = 0, right = nums.size() - 1;
+        while (cur <= right) {
+            if (nums[cur] == 0) {
+                swap(nums[left++], nums[cur++]); // NOTE, cur++
+            }
+            else if (nums[cur] == 2) {
+                swap(nums[right--], nums[cur]); // NOTE, cur
+            }
+            else {
+                cur++;
+            }
+        }
+    }
+};
 
 
 

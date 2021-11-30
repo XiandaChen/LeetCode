@@ -7,42 +7,25 @@ struct TreeNode {
     TreeNode * right;
 };
 
-/*
-   2
-  / \
- 1  3
-*/
-bool helper(TreeNode * root, int & maxPath, int & minPath) {
-    if (!root) return true;
-
-    if (minPath > root->val || root->val > maxPath) return false;
-
-    bool leftFlag = true, rightFlag = true;
-    if (root->left) {
-        maxPath = root->val;
-        leftFlag &= helper(root->left, maxPath, minPath);
+// 98. Validate Binary Search Tree
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+        
+        return helper(root, LONG_MAX, LONG_MIN);
     }
+    
+    bool helper(TreeNode * root, long maxPath, long minPath) {
+        if (!root) return true;
 
-    if (root->right) {
-        minPath = root->val;
-        rightFlag &= helper(root->right, maxPath, minPath);
-    }
+        if (root->val <= minPath || root->val >= maxPath) return false;  // NOTE, <=
+                
+        return helper(root->left, root->val, minPath)
+            && helper(root->right, maxPath, root->val);
 
-    if (root->left && root->right) return leftFlag && rightFlag;
-    if (root->left) return leftFlag;
-    if (root->right) return rightFlag;
-
-    return true;
-}
-
-bool validBST (TreeNode * root) {
-    if (!root) return true;
-
-    int maxPath = INT_MAX, minPath = INT_MIN;
-
-    return helper(root, maxPath, minPath);
-}
-
+     }
+};
 
 
 /*

@@ -676,6 +676,33 @@ class Solution {
 public:
     TreeNode* deleteNode(TreeNode* root, int key) {
         if (!root) return NULL;
+        if (root->val > key) {
+            root->left = deleteNode(root->left, key);
+        }
+        else if (root->val < key) {
+            root->right = deleteNode(root->right, key);
+        }
+        else {
+            // left/right not exist, root=right/left
+            // left & right not exist, root=null
+            if (!root->left || !root->right) {
+                root = (root->left) ? root->left : root->right;
+            }
+            else {
+                // both left and right exist, root=min of right
+                TreeNode * cur = root->right;
+                while (cur->left) cur = cur->left;
+                root->val =  cur->val;
+                root->right = deleteNode(root->right, cur->val);
+            }
+        }
+        return root;
+    }
+};
+class Solution {
+public:
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (!root) return NULL;
         if (root->val == key) {
             if (!root->right) return root->left;
             else {
