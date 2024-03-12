@@ -76,3 +76,9 @@ int main() {
 
     return 0;
 }
+
+/*
+RAII stands for "Resource Acquisition Is Initialization," and it is a programming idiom in C++ where resource management is tied to the lifespan of an object. RAII is often implemented using classes, and such classes are referred to as RAII classes.
+
+The key idea behind RAII is to use a class to manage resources in such a way that the resource is acquired during the object's construction and released during its destruction. This ensures that resources are properly managed and that the cleanup logic is automatically invoked when the object goes out of scope, regardless of how the scope is exited (e.g., due to normal flow, an exception, or an early return).
+*/

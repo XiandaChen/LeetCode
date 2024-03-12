@@ -4,9 +4,25 @@
 
 class MyClass {
 public:
+	// Four member functions silently created by compiler
+	// Default constructor 
     MyClass() {}
-    MyClass(int value) : data(value) {}
+    // Default destructor
     ~MyClass() {}
+    // Copy constructor
+    MyClass(const MyClass& other) : data(other.data) {
+        std::cout << "Copy constructor called." << std::endl;
+    }
+    // Assignment operator (optional)
+    MyClass& operator=(const MyClass& other) {
+        if (this != &other) {  // Avoid self-assignment
+            data = other.data;
+            std::cout << "Assignment operator called." << std::endl;
+        }
+        return *this;
+    }
+	
+    MyClass(int value) : data(value) {}
     
     // Overloading binary operator+
     MyClass operator+(const MyClass& other) const {
